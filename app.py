@@ -14,17 +14,14 @@ from reportlab.lib.enums import TA_CENTER
 # ---------------------------------------------------------
 def gerar_excel(df):
     output = BytesIO()
-    # Usando openpyxl para criar o xlsx formatado
     with pd.ExcelWriter(output, engine='openpyxl') as writer:
         df.to_excel(writer, index=False, sheet_name='Consolidado')
         worksheet = writer.sheets['Consolidado']
         
-        # Definindo a largura das colunas
-        worksheet.column_dimensions['A'].width = 20  # Código Simpas
-        worksheet.column_dimensions['B'].width = 60  # Medicamento
-        worksheet.column_dimensions['C'].width = 25  # Quantidade
+        worksheet.column_dimensions['A'].width = 20  
+        worksheet.column_dimensions['B'].width = 60  
+        worksheet.column_dimensions['C'].width = 25  
         
-        # Aplicando a quebra de texto na coluna de Medicamento e alinhando ao topo
         wrap_format = openpyxl.styles.Alignment(wrap_text=True, vertical='top')
         top_format = openpyxl.styles.Alignment(vertical='top')
         
@@ -35,29 +32,21 @@ def gerar_excel(df):
 
     return output.getvalue()
 
-def gerar_pdf(df, nome_do_arquivo):
+def gerar_pdf(df, nome_sem_extensao):
     buffer = BytesIO()
     doc = SimpleDocTemplate(buffer, pagesize=A4, rightMargin=20, leftMargin=20, topMargin=20, bottomMargin=20)
     elementos = []
     
     estilos = getSampleStyleSheet()
     
-    # --- NOVO: Adicionando o Cabeçalho Centralizado ---
     estilo_titulo = estilos['Title']
-    estilo_titulo.alignment = TA_CENTER # Garante que fique no centro
+    estilo_titulo.alignment = TA_CENTER 
     estilo_titulo.fontSize = 14
     
-    # --- NOVO: Capturando o nome do arquivo ---
-    nome_original = nome_do_arquivo.name
-    # Separa o nome da extensão (ex: 'ARBOVIROSE' e '.xls')
-    nome_sem_extensao, _ = os.path.splitext(nome_original)
-    # ------------------------------------------
-    
-    # Cria o parágrafo do título com o nome do arquivo e adiciona um espaço abaixo dele
+    # ATUALIZADO: Título agora usa "Programa: " e o nome sem extensão
     titulo_pdf = Paragraph(f"Programa: {nome_sem_extensao}", estilo_titulo)
     elementos.append(titulo_pdf)
-    elementos.append(Spacer(1, 20)) # Espaço de 20 pontos entre o título e a tabela
-    # --------------------------------------------------
+    elementos.append(Spacer(1, 20)) 
     
     estilo_medicamento = estilos['Normal']
     estilo_medicamento.fontSize = 9
@@ -97,11 +86,8 @@ arquivo_upado = st.file_uploader("Selecione o arquivo Excel", type=["xls", "xlsx
 
 if arquivo_upado is not None:
     try:
-        # --- NOVO: Capturando o nome do arquivo ---
         nome_original = arquivo_upado.name
-        # Separa o nome da extensão (ex: 'ARBOVIROSE' e '.xls')
         nome_sem_extensao, _ = os.path.splitext(nome_original)
-        # ------------------------------------------
 
         try:
             df = pd.read_excel(
@@ -145,17 +131,17 @@ if arquivo_upado is not None:
             st.download_button(
                 label="📥 Baixar em Excel (.xlsx)",
                 data=arquivo_xlsx,
-                file_name=f"{nome_sem_extensao}_SIMPAS.xlsx", # Usa o nome capturado
+                file_name=f"{nome_sem_extensao}_SIMPAS.xlsx",
                 mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
             )
             
         with col2:
-            # Passamos o nome original para aparecer no título de dentro do PDF
-            arquivo_pdf = gerar_pdf(df_consolidado, nome_original)
+            # ATUALIZADO: Passando a variável 'nome_sem_extensao' para a função gerar_pdf
+            arquivo_pdf = gerar_pdf(df_consolidado, nome_sem_extensao)
             st.download_button(
                 label="📄 Baixar em PDF (.pdf)",
                 data=arquivo_pdf,
-                file_name=f"{nome_sem_extensao}_SIMPAS.pdf", # Usa o nome capturado
+                file_name=f"{nome_sem_extensao}_SIMPAS.pdf",
                 mime="application/pdf"
             )
         
