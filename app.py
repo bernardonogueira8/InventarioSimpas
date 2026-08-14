@@ -47,8 +47,14 @@ def gerar_pdf(df, nome_do_arquivo):
     estilo_titulo.alignment = TA_CENTER # Garante que fique no centro
     estilo_titulo.fontSize = 14
     
+    # --- NOVO: Capturando o nome do arquivo ---
+    nome_original = nome_do_arquivo.name
+    # Separa o nome da extensão (ex: 'ARBOVIROSE' e '.xls')
+    nome_sem_extensao, _ = os.path.splitext(nome_original)
+    # ------------------------------------------
+    
     # Cria o parágrafo do título com o nome do arquivo e adiciona um espaço abaixo dele
-    titulo_pdf = Paragraph(f"Consolidado: {nome_do_arquivo}", estilo_titulo)
+    titulo_pdf = Paragraph(f"Programa: {nome_sem_extensao}", estilo_titulo)
     elementos.append(titulo_pdf)
     elementos.append(Spacer(1, 20)) # Espaço de 20 pontos entre o título e a tabela
     # --------------------------------------------------
@@ -139,7 +145,7 @@ if arquivo_upado is not None:
             st.download_button(
                 label="📥 Baixar em Excel (.xlsx)",
                 data=arquivo_xlsx,
-                file_name=f"{nome_sem_extensao}_consolidado.xlsx", # Usa o nome capturado
+                file_name=f"{nome_sem_extensao}_SIMPAS.xlsx", # Usa o nome capturado
                 mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
             )
             
@@ -149,7 +155,7 @@ if arquivo_upado is not None:
             st.download_button(
                 label="📄 Baixar em PDF (.pdf)",
                 data=arquivo_pdf,
-                file_name=f"{nome_sem_extensao}_consolidado.pdf", # Usa o nome capturado
+                file_name=f"{nome_sem_extensao}_SIMPAS.pdf", # Usa o nome capturado
                 mime="application/pdf"
             )
         
